@@ -1,4 +1,19 @@
 // src/pages/index.tsx
+import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+
 export default function Home() {
-  return <h1>Hello, World!</h1>;
+  return (
+    <Box
+      minH="100vh"
+      bg="background" // semanticTokens.primary が適用される
+      color="text" // semanticTokens.text が適用される
+      p={8}
+    >
+      <VStack gap={4}>
+        <Heading as="h1" size="2xl">
+          Hello, World!
+        </Heading>
+      </VStack>
+    </Box>
+  );
 }
