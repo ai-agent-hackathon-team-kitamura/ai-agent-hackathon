@@ -53,7 +53,7 @@ const config = defineConfig({
     // セマンティックトークン（ブランドカラーを semantic name でマップ）
     semanticTokens: {
       colors: {
-        brand: {
+        primary: {
           solid: { value: "{colors.brand.500}" },
           contrast: { value: "{colors.brand.50}" },
           fg: { value: "{colors.brand.700}" },

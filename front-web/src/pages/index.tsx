@@ -1,5 +1,4 @@
-// src/pages/index.tsx
-import { Box, Button, Heading, VStack } from "@chakra-ui/react";
+import { Box, Heading, VStack } from "@chakra-ui/react";
 import Link from "next/link";
 
 export default function Home() {
