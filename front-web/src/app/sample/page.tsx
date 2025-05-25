@@ -1,3 +1,4 @@
+import React from "react";
 import { SampleBarChart } from "@/features/sample/chart/SampleBarChart";
 import { SampleRadarChart } from "@/features/sample/chart/SampleRadarChart";
 import { Box, Button, Heading, VStack } from "@chakra-ui/react";
