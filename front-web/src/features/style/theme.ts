@@ -45,6 +45,7 @@ const config = defineConfig({
           700: { value: "#4d0099" },
           800: { value: "#330066" },
           900: { value: "#1a0033" },
+          950: { value: "#0d001a" },
         },
       },
     },
@@ -52,8 +53,16 @@ const config = defineConfig({
     // セマンティックトークン（ブランドカラーを semantic name でマップ）
     semanticTokens: {
       colors: {
-        primary: { value: "{colors.brand.500}" },
-        background: { value: "{colors.cyan.50}" },
+        brand: {
+          solid: { value: "{colors.brand.500}" },
+          contrast: { value: "{colors.brand.50}" },
+          fg: { value: "{colors.brand.700}" },
+          muted: { value: "{colors.brand.100}" },
+          subtle: { value: "{colors.brand.200}" },
+          emphasized: { value: "{colors.brand.300}" },
+          focusRing: { value: "{colors.brand.500}" },
+        },
+        background: { value: "{colors.gray.50}" },
         text: { value: "{colors.gray.900}" },
       },
     },

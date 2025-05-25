@@ -1,5 +1,5 @@
 // src/pages/index.tsx
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, VStack } from "@chakra-ui/react";
 
 export default function Home() {
   return (
@@ -13,6 +13,7 @@ export default function Home() {
         <Heading as="h1" size="2xl">
           Hello, World!
         </Heading>
+        <Button colorPalette="brand">Sample ColorPalette</Button>
       </VStack>
     </Box>
   );
