@@ -1,8 +1,7 @@
-// src/pages/index.tsx
 import { Box, Button, Heading, VStack } from "@chakra-ui/react";
 import Link from "next/link";
 
-export default function Home() {
+export default function Sample() {
   return (
     <Box
       minH="100vh"
@@ -14,7 +13,8 @@ export default function Home() {
         <Heading as="h1" size="2xl">
           Hello, World!
         </Heading>
-        <Link href="sample">Sample</Link>
+        <Link href="/">Top</Link>
+        <Button colorPalette="brand">Sample ColorPalette</Button>
       </VStack>
     </Box>
   );
