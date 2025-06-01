@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import { Prose } from "@/components/ui/prose";
 import Markdown from "react-markdown";
 
-export default function Dashboard() {
+export default function Advise() {
   return (
     <Box
       minH="100vh"
