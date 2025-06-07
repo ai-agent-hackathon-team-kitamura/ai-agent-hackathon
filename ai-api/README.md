@@ -29,15 +29,16 @@ Google Cloud Vertex AI（Gemini）との連携により、チャット形式の 
 ```text
 ai-api/
 ├── app/
-│   ├── main.py                    # FastAPIアプリケーション（エントリーポイント）
-│   ├── router.py                  # ルーティング管理（コントローラー）
-│   ├── spec.py                    # API仕様とPydanticモデル定義
-│   ├── domain/                    # ドメイン層（ビジネスロジック）
-│   ├── infrastructure/            # インフラ層（外部API連携）
+│   ├── main.py                   # FastAPIアプリケーション（エントリーポイント）
+│   ├── router.py                 # ルーティング管理（コントローラー）
+│   ├── spec.py                   # API仕様とPydanticモデル定義
+│   ├── domain/                   # ドメイン層（ビジネスロジック）
+│   ├── infrastructure/           # インフラ層（外部API連携）
 │   │   ├── config.py             # 設定管理（環境変数読み込み）
 │   │   └── vertex_client.py      # VertexAI/Gemini クライアント
-│   └── services/                  # アプリケーションサービス
-├── tests/                         # テストファイル
+│   └── services/                 # アプリケーションサービス
+│       └── gateways              # アプリケーションが依存する抽象（ポート）定義
+├── tests/                        # テストファイル
 ├── .env                          # 環境変数設定
 ├── pyproject.toml                # Poetry設定・依存関係
 └── README.md                     # このファイル
