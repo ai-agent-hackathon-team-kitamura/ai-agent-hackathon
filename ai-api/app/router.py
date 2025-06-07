@@ -22,7 +22,7 @@ async def health_check():
     return {"status": "healthy", "version": "0.1.0"}
 
 
-@router.post("/ai/chat", response_model=ChatResponse)
+@router.post("/chat", response_model=ChatResponse)
 async def chat_completion(request: ChatRequest):
     """
     チャット形式での会話エンドポイント

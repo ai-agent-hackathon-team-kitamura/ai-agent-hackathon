@@ -3,8 +3,12 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
+class HealthResponse(BaseModel):
+    """ヘルスチェックレスポンス"""
+    status: str = Field(..., description="サービスの状態", example="healthy")
+    version: str = Field(..., description="APIのバージョン", example="0.1.0")
 
-class ChatMessage(BaseModel):
+class ChatMessageDto(BaseModel):
     """チャットメッセージ"""
     role: Literal["user", "assistant"] = Field(
         ...,
@@ -19,7 +23,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     """チャット形式の会話リクエスト"""
-    messages: List[ChatMessage] = Field(
+    messages: List[ChatMessageDto] = Field(
         ...,
         description="会話履歴のメッセージリスト",
         example=[
@@ -34,11 +38,4 @@ class ChatResponse(BaseModel):
     """チャット会話レスポンス"""
     success: bool = Field(..., description="処理の成功/失敗")
     generated_text: Optional[str] = Field(None, description="AIの返答")
-    conversation_context: Optional[str] = Field(None, description="会話のコンテキスト")
     error: Optional[str] = Field(None, description="エラーメッセージ（失敗時のみ）")
-
-
-class HealthResponse(BaseModel):
-    """ヘルスチェックレスポンス"""
-    status: str = Field(..., description="サービスの状態", example="healthy")
-    version: str = Field(..., description="APIのバージョン", example="0.1.0")
