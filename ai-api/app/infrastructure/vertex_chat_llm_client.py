@@ -3,7 +3,7 @@ from langchain_google_vertexai import ChatVertexAI
 from app.infrastructure.config import vertex_config
 
 
-class VertexAIClient:
+class VertexChatLLMClient:
     """VertexAI クライアントクラス"""
     
     def __init__(self):
@@ -16,11 +16,10 @@ class VertexAIClient:
              max_output_tokens=int(os.getenv("MAX_TOKENS", 1024)),
          )
     
-    async def chat(self, messages):
+    async def chat(self, messages) -> str:
         """
         LangChain Message オブジェクト（System/Human/AI）を配列で受け取り、
         非同期で 1 ターン返すだけ
         """
-        return await self._llm.ainvoke(messages)
-# グローバルクライアントインスタンス
-vertex_client = VertexAIClient()
+        response = await self._llm.ainvoke(messages)
+        return response.content

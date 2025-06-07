@@ -1,25 +1,22 @@
-"""AI関連のアプリケーションサービス"""
-
-from typing import Protocol
+from typing import Protocol, List
 from app.domain.chat import Chat, Message
 
 
-class AIProvider(Protocol):
-    """AI プロバイダーのインターフェース（依存性逆転の原則）"""
-    
-    async def chat(self, messages: list) -> str:
-        """チャット"""
-        ...
+class ChatLLMClient(Protocol):
+    """外部 LLM とのチャット用クライアント（依存性逆転）"""
+
+    async def chat(self, messages: list[dict]) -> str:
+        """与えられたメッセージ履歴に対し 1 ターンの応答を返す"""
 
 
-class AIService:
-    """AI関連のビジネスロジックを担当するサービス"""
-    
-    def __init__(self, ai_provider: AIProvider):
-        self.ai_provider = ai_provider
-    
-    async def chat_completion(self, messages: list) -> dict:
-        """チャット形式での会話"""
+class LLMChatService:
+    """LLM を用いたチャット応答生成のアプリケーションサービス"""
+
+    def __init__(self, llm_client: ChatLLMClient):
+        self._llm_client = llm_client
+
+    async def invoke(self, messages: List[Message]) -> dict:
+        """ユーザー入力を受け取り、LLM から応答を生成して返す"""
         if not messages:
             return {"success": False, "error": "メッセージが空です"}
         
@@ -36,8 +33,7 @@ class AIService:
                 })
             
             # AIチャット
-            response = await self.ai_provider.chat(langchain_messages)
-            generated_text = response.content                     
+            generated_text = await self._llm_client.chat(langchain_messages)              
             return {
                 "success": True,
                 "generated_text": generated_text
