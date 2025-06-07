@@ -10,6 +10,8 @@ packages    = [{ include = "app" }]
 python  = "^3.11"
 fastapi = "^0.115"
 uvicorn = { extras = ["standard"], version = "^0.34" }
+google-cloud-aiplatform = "^1.96.0"
+python-dotenv = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3"
