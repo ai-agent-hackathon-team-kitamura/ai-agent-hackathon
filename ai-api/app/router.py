@@ -1,8 +1,8 @@
 """全てのルーティングを管理"""
 
-import os
 from fastapi import APIRouter
-from app.services.ai_service import ai_service
+from app.services.ai_service import AIService
+from app.infrastructure.vertex_client import vertex_client
 from app.spec import (
     ChatRequest, ChatResponse, HealthResponse
 )
@@ -32,5 +32,7 @@ async def chat_completion(request: ChatRequest):
     会話履歴を考慮してGemini AIが返答を生成します。
     roleは'user'（ユーザー）または'assistant'（AI）を指定してください。
     """
+    # 依存性注入：インフラ層をアプリケーションサービスに注入
+    ai_service = AIService(vertex_client)
     result = await ai_service.chat_completion(request.messages)
     return result

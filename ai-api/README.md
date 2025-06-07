@@ -26,29 +26,26 @@ Google Cloud Vertex AI（Gemini）との連携により、チャット形式の 
 
 ## フォルダ構成
 
-```
+```text
 ai-api/
 ├── app/
 │   ├── main.py                    # FastAPIアプリケーション（エントリーポイント）
-│   ├── router.py                  # 全てのルーティング管理
+│   ├── router.py                  # ルーティング管理（コントローラー）
 │   ├── spec.py                    # API仕様とPydanticモデル定義
-│   ├── infrastructure/            # VertexAI APIを叩くための諸々
+│   ├── domain/                    # ドメイン層（ビジネスロジック）
+│   ├── infrastructure/            # インフラ層（外部API連携）
 │   │   ├── config.py             # 設定管理（環境変数読み込み）
 │   │   └── vertex_client.py      # VertexAI/Gemini クライアント
 │   └── services/                  # アプリケーションサービス
-│       └── ai_service.py         # AIサービス（ビジネスロジック）
 ├── tests/                         # テストファイル
 ├── .env                          # 環境変数設定
 ├── pyproject.toml                # Poetry設定・依存関係
 └── README.md                     # このファイル
 ```
 
-### 設計思想
+### 依存関係の流れ
 
-- **router.py**: 全てのエンドポイントを一箇所で管理
-- **spec.py**: API 仕様と Pydantic モデルを分離し、OpenAPI ドキュメントを充実
-- **infrastructure/**: 外部 API（VertexAI）との連携を担当
-- **services/**: ビジネスロジックを担当、infrastructure を利用
+router → services → domain ← infrastructure
 
 ---
 

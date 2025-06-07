@@ -1,13 +1,22 @@
-from typing import List, Dict, Union
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from app.infrastructure.vertex_client import vertex_client
+"""AI関連のアプリケーションサービス"""
+
+from typing import Protocol
+from app.domain.chat import Chat, Message
+
+
+class AIProvider(Protocol):
+    """AI プロバイダーのインターフェース（依存性逆転の原則）"""
+    
+    async def chat(self, messages: list) -> str:
+        """チャット"""
+        ...
 
 
 class AIService:
     """AI関連のビジネスロジックを担当するサービス"""
     
-    def __init__(self):
-        self.vertex_client = vertex_client
+    def __init__(self, ai_provider: AIProvider):
+        self.ai_provider = ai_provider
     
     async def chat_completion(self, messages: list) -> dict:
         """チャット形式での会話"""
@@ -15,32 +24,38 @@ class AIService:
             return {"success": False, "error": "メッセージが空です"}
         
         try:
-            # messages 配列を LangChain Message に変換
-            lc_messages = []
-            for m in messages:
-                role = m.role if hasattr(m, "role") else m.get("role", "user")
-                content = m.content if hasattr(m, "content") else m.get("content", "")
-                if role == "user":
-                    lc_messages.append(HumanMessage(content=content))
-                elif role == "assistant":
-                    lc_messages.append(AIMessage(content=content))
-                elif role == "system":
-                    lc_messages.append(SystemMessage(content=content))
-
-            # Vertex AI (Gemini) で生成
-            response = await self.vertex_client.chat(lc_messages)
-
+            # ドメインオブジェクトに変換
+            chat = self._create_chat_from_messages(messages)
+            
+            # LangChain形式に変換
+            langchain_messages = []
+            for message in chat.messages:
+                langchain_messages.append({
+                    "role": message.role,
+                    "content": message.content
+                })
+            
+            # AIチャット
+            response = await self.ai_provider.chat(langchain_messages)
+            generated_text = response.content                     
             return {
                 "success": True,
-                "generated_text": response.content,
+                "generated_text": generated_text
             }
-
         except Exception as e:
             return {
                 "success": False,
                 "error": str(e),
             }
-
-
-# グローバルサービスインスタンス
-ai_service = AIService()
+    
+    def _create_chat_from_messages(self, messages: list) -> Chat:
+        """メッセージリストからChatドメインオブジェクトを作成"""
+        domain_messages = []
+        
+        for message in messages:   
+            domain_messages.append(Message(
+                role=message.role,
+                content=message.content
+            ))
+            
+        return Chat(messages=domain_messages)
