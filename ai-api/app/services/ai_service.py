@@ -1,5 +1,5 @@
-"""AI関連のアプリケーションサービス"""
-
+from typing import List, Dict, Union
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from app.infrastructure.vertex_client import vertex_client
 
 
@@ -15,45 +15,30 @@ class AIService:
             return {"success": False, "error": "メッセージが空です"}
         
         try:
-            # 会話履歴全体をコンテキストとして構築
-            conversation_context = ""
-            for message in messages:
-                # Pydanticモデルの場合
-                if hasattr(message, 'role') and hasattr(message, 'content'):
-                    role = message.role
-                    content = message.content
-                    if role == "user":
-                        conversation_context += f"ユーザー: {content}\n"
-                    elif role == "assistant":
-                        conversation_context += f"アシスタント: {content}\n"
-                # 辞書の場合（後方互換性）
-                elif isinstance(message, dict):
-                    role = message.get("role", "user")
-                    content = message.get("content", "")
-                    if role == "user":
-                        conversation_context += f"ユーザー: {content}\n"
-                    elif role == "assistant":
-                        conversation_context += f"アシスタント: {content}\n"
-                # 文字列の場合（後方互換性）
-                elif isinstance(message, str):
-                    conversation_context += f"ユーザー: {message}\n"
-            
-            # 最後にAIの返答を求めるプロンプトを追加
-            prompt = f"{conversation_context}アシスタント: "
-            
-            # VertexAI経由でテキスト生成
-            generated_text = await self.vertex_client.generate_text(prompt)
-            
+            # messages 配列を LangChain Message に変換
+            lc_messages = []
+            for m in messages:
+                role = m.role if hasattr(m, "role") else m.get("role", "user")
+                content = m.content if hasattr(m, "content") else m.get("content", "")
+                if role == "user":
+                    lc_messages.append(HumanMessage(content=content))
+                elif role == "assistant":
+                    lc_messages.append(AIMessage(content=content))
+                elif role == "system":
+                    lc_messages.append(SystemMessage(content=content))
+
+            # Vertex AI (Gemini) で生成
+            response = await self.vertex_client.chat(lc_messages)
+
             return {
                 "success": True,
-                "generated_text": generated_text,
-                "conversation_context": conversation_context.strip()
+                "generated_text": response.content,
             }
+
         except Exception as e:
             return {
                 "success": False,
                 "error": str(e),
-                "conversation_context": None
             }
 
 
