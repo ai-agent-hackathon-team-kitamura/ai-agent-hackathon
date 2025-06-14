@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import { Provider } from "@/features/style/provider";
+import UIDInitializer from "@/components/UIDInitializer";
 
 export const metadata: Metadata = {
   title: "Front Web App",
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" suppressHydrationWarning>
       <body>
+        <UIDInitializer />
         <Provider>{children}</Provider>
       </body>
     </html>
