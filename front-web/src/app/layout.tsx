@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import { Provider } from "@/features/style/provider";
+import ReduxProvider from "@/providers/ReduxProvider";
 
 export const metadata: Metadata = {
   title: "Front Web App",
@@ -11,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" suppressHydrationWarning>
       <body>
-        <Provider>{children}</Provider>
+        <ReduxProvider>
+          <Provider>{children}</Provider>
+        </ReduxProvider>
       </body>
     </html>
   );
