@@ -8,23 +8,23 @@ import {
 import ChatMessage from './ChatMessage';
 
 interface Message {
-    text: string;
-    sender: 'user' | 'bot';
+    content: string;
+    role: 'user' | 'bot';
 }
 
 const ChatUI: React.FC = () => {
     const messages: Message[] = [
-        { text: 'Hello!', sender: 'bot' },
-        { text: 'Hi there!', sender: 'user' },
-        { text: 'How can I help you?', sender: 'bot' },
+        { content: 'Hello!', role: 'bot' },
+        { content: 'Hi there!', role: 'user' },
+        { content: 'How can I help you?', role: 'bot' },
     ];
 
     return (
         <Flex direction="column" height="calc(100vh - 50px)" justify="space-between">
             <Box overflowY="auto">
                 {messages.map((message, index) => (
-                    <ChatMessage key={index} sender={message.sender}>
-                        {message.text}
+                    <ChatMessage key={index} sender={message.role}>
+                        {message.content}
                     </ChatMessage>
                 ))}
             </Box>
