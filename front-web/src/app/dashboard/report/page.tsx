@@ -15,24 +15,6 @@ import { BiHappyBeaming } from 'react-icons/bi';
 import { FiFrown } from 'react-icons/fi';
 
 const Dashboard = () => {
-    // Sample data for charts
-    const healthData = [
-        { name: '1月', 健康: 85, やる気: 78, 人間関係: 82 },
-        { name: '2月', 健康: 87, やる気: 80, 人間関係: 85 },
-        { name: '3月', 健康: 89, やる気: 85, 人間関係: 88 },
-        { name: '4月', 健康: 92, やる気: 88, 人間関係: 90 },
-        { name: '5月', 健康: 90, やる気: 92, 人間関係: 87 },
-        { name: '6月', 健康: 94, やる気: 89, 人間関係: 92 }
-    ];
-
-    const motivationData = [
-        { name: '非常に高い', value: 25, color: '#10B981' },
-        { name: '高い', value: 45, color: '#3B82F6' },
-        { name: '普通', value: 20, color: '#F59E0B' },
-        { name: '低い', value: 10, color: '#EF4444' }
-    ];
-
-    const cardBg = 'white';
     const textColor = 'gray.800';
     const mutedColor = 'gray.600';
 

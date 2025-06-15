@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import {
     Box,
     Flex,
@@ -15,11 +16,12 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-    const [activeTab, setActiveTab] = useState('latest-report');
+    const pathname = usePathname();
+    const router = useRouter();
 
     const MenuItems = [
-        { id: 'latest-report', label: '最新レポート' },
-        { id: 'data-comparison', label: 'データ比較' }
+        { id: 'latest-report', label: '最新レポート', path: '/dashboard/report' },
+        { id: 'data-comparison', label: 'データ比較', path: '/dashboard/comparison' }
     ];
 
     const sidebarBg = 'blue.600';
@@ -40,23 +42,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Heading size="lg" mb={8}>経営ダッシュボード</Heading>
                     <Stack gap={2} align="stretch">
                         {MenuItems.map((item) => {
-                            const Icon = item.icon;
+                            const isActive = pathname === item.path;
                             return (
                                 <Button
                                     key={item.id}
-                                    onClick={() => setActiveTab(item.id)}
-                                    variant={activeTab === item.id ? 'solid' : 'ghost'}
-                                    bg={activeTab === item.id ? 'white' : 'transparent'}
-                                    color={activeTab === item.id ? 'blue.600' : 'blue.100'}
+                                    onClick={() => router.push(item.path)}
+                                    variant={isActive ? 'solid' : 'ghost'}
+                                    bg={isActive ? 'white' : 'transparent'}
+                                    color={isActive ? 'blue.600' : 'blue.100'}
                                     _hover={{
-                                        bg: activeTab === item.id ? 'white' : 'blue.700',
-                                        color: activeTab === item.id ? 'blue.600' : 'white'
+                                        bg: isActive ? 'white' : 'blue.700',
+                                        color: isActive ? 'blue.600' : 'white'
                                     }}
                                     justifyContent="flex-start"
                                     fontWeight="medium"
                                     borderRadius="lg"
                                     transition="all 0.2s"
-                                    shadow={activeTab === item.id ? 'md' : 'none'}
+                                    shadow={isActive ? 'md' : 'none'}
                                 >
                                     {item.label}
                                 </Button>
