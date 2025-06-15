@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BarChart, TrendingUp } from 'lucide-react';
 import {
     Box,
     Flex,
@@ -19,8 +18,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [activeTab, setActiveTab] = useState('latest-report');
 
     const MenuItems = [
-        { id: 'latest-report', label: '最新レポート', icon: TrendingUp },
-        { id: 'data-comparison', label: 'データ比較', icon: BarChart }
+        { id: 'latest-report', label: '最新レポート' },
+        { id: 'data-comparison', label: 'データ比較' }
     ];
 
     const sidebarBg = 'blue.600';
@@ -59,7 +58,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     transition="all 0.2s"
                                     shadow={activeTab === item.id ? 'md' : 'none'}
                                 >
-                                    <Icon size={20} style={{ marginRight: '8px' }} />
                                     {item.label}
                                 </Button>
                             );
