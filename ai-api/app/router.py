@@ -3,9 +3,7 @@
 from fastapi import APIRouter
 from app.services.llm_chat_service import LLMChatService
 from app.infrastructure.vertex_chat_llm_client import VertexChatLLMClient
-from app.spec import (
-    ChatRequest, ChatResponse, HealthResponse
-)
+from app.spec import ChatRequest, ChatResponse, HealthResponse
 
 router = APIRouter()
 
@@ -33,5 +31,5 @@ async def chat_completion(request: ChatRequest):
     llm_client = VertexChatLLMClient()
     # 依存性注入：インフラ層をアプリケーションサービスに注入
     chat_service = LLMChatService(llm_client)
-    result = await chat_service.invoke(request.messages)
+    result = await chat_service.invoke(request.messages, request.schema)
     return result

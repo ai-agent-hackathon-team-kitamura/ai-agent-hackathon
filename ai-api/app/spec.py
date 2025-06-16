@@ -32,10 +32,22 @@ class ChatRequest(BaseModel):
             {"role": "user", "content": "日本の首都はどこですか？"}
         ]
     )
+    schema: Optional[dict] = Field(
+    None,
+    description="JSON Schema（Draft-07 サブセット）。指定すると LLM がこの構造で返す",
+    example={
+            "type": "object",
+            "properties": {
+                "answer": { "type": "string" }
+            },
+            "required": ["answer"]
+        }
+    )
 
 
 class ChatResponse(BaseModel):
     """チャット会話レスポンス"""
     success: bool = Field(..., description="処理の成功/失敗")
     generated_text: Optional[str] = Field(None, description="AIの返答")
+    generated_json: Optional[dict] = None
     error: Optional[str] = Field(None, description="エラーメッセージ（失敗時のみ）")
