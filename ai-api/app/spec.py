@@ -51,3 +51,20 @@ class ChatResponse(BaseModel):
     generated_text: Optional[str] = Field(None, description="AIの返答")
     generated_json: Optional[dict] = None
     error: Optional[str] = Field(None, description="エラーメッセージ（失敗時のみ）")
+
+
+class HealthData(BaseModel):
+    """面談時の健康状態データ"""
+    score: int = Field(..., description="健康スコア（1-5）", example=5, ge=1, le=5)
+    note: str = Field(..., description="健康状態に関するメモ", example="前回よりぐっすり寝れたみたい。要経過観察")
+
+class StartSurveyRequest(BaseModel):
+    """面談開始リクエスト"""
+    health: HealthData = Field(..., description="最新の健康状態データ")
+    createdAt: str = Field(..., description="作成日", example="20250615")
+
+class StartSurveyResponse(BaseModel):
+    """面談開始レスポンス"""
+    success: bool = Field(..., description="処理の成功/失敗")
+    opening_message: Optional[str] = Field(None, description="AIが生成した面談開始のメッセージ")
+    error: Optional[str] = Field(None, description="エラーメッセージ（失敗時のみ）")
