@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
-    Input,
     Button,
     Flex,
     Alert,
+    Text,
+    Textarea,
 } from '@chakra-ui/react';
+import { MdSend } from 'react-icons/md';
 import ChatMessage from './ChatMessage';
 import { useSendMessageMutation } from '@/store/api';
 
@@ -26,6 +28,16 @@ const ChatUI: React.FC = () => {
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+
+    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setInputValue(e.target.value);
+        
+        // 高さを自動調整
+        const textarea = e.target;
+        textarea.style.height = 'auto';
+        textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    };
+
 
     useEffect(() => {
         scrollToBottom();
@@ -60,14 +72,56 @@ const ChatUI: React.FC = () => {
     };
 
     return (
-        <Flex direction="column" height="calc(100vh - 50px)" justify="space-between">
-            <Box overflowY="auto">
-                {messages.map((message) => (
-                    <ChatMessage key={message.id} sender={message.role === 'user' ? 'user' : 'bot'}>
-                        {message.content}
-                    </ChatMessage>
-                ))}
-                <div ref={messagesEndRef} />
+        <Flex direction="column" height="calc(100vh - 150px)" justify="space-between">
+            <Box
+                flex="1"
+                px={4}
+                overflowY="scroll"
+                css={{
+                    '&::-webkit-scrollbar': {
+                        width: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        background: '#f1f1f1',
+                        borderRadius: '10px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        background: '#c1c1c1',
+                        borderRadius: '10px',
+                    },
+                    '&::-webkit-scrollbar-thumb:hover': {
+                        background: '#a8a8a8',
+                    },
+                }}
+            >
+                <Box
+                    minH="100%"
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="flex-end"
+                >
+                    {messages.length > 0 && (
+                        <Flex alignItems="center" mb={8} width="100%">
+                            <Box flex="1" height="2px" bg="#662B1C"></Box>
+                            <Text
+                                fontSize="2xl"
+                                fontWeight="bold"
+                                color="#662B1C"
+                                px={6}
+                                whiteSpace="nowrap"
+                            >
+                                2025年6月エンゲージメントサーベイ
+                            </Text>
+                            <Box flex="1" height="2px" bg="#662B1C"></Box>
+                        </Flex>
+                    )}
+                    {messages.map((message) => (
+                        <ChatMessage key={message.id} sender={message.role === 'user' ? 'user' : 'bot'}>
+                            {message.content}
+                        </ChatMessage>
+                    ))}
+                    <div ref={messagesEndRef} />
+                </Box>
             </Box>
             {isError && error && (
                 <Box paddingX={3} marginBottom={2}>
@@ -85,24 +139,50 @@ const ChatUI: React.FC = () => {
                 </Box>
             )}
             <Box paddingX={3} marginBottom={3}>
-                <Flex alignItems="center" gap={2} width="100%">
-                    <Input
-                        placeholder="Type your message..."
-                        borderRadius="full"
+                <Box position="relative" width="100%">
+                    <Textarea
+                        placeholder="メッセージを入力"
+                        borderRadius="lg"
                         value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
+                        onChange={handleTextareaChange}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.shiftKey && !isLoading) {
+                                e.preventDefault();
+                                handleSendMessage();
+                            }
+                        }}
                         disabled={isLoading}
+                        bg="white"
+                        border="1px solid"
+                        borderColor="gray.300"
+                        _focus={{
+                            borderColor: "blue.400",
+                            boxShadow: "0 0 0 1px #3182ce"
+                        }}
+                        pr={12}
+                        resize="none"
+                        rows={1}
+                        minH="40px"
+                        maxH="120px"
+                        overflowY="hidden"
+                        lineHeight="24px"
                     />
                     <Button
-                        colorScheme="blue"
-                        borderRadius="full"
+                        position="absolute"
+                        right={2}
+                        bottom={2}
+                        bg="transparent"
+                        _hover={{ bg: "gray.100" }}
+                        p={2}
                         onClick={handleSendMessage}
                         disabled={isLoading}
+                        borderRadius="lg"
+                        minW="auto"
+                        h="auto"
                     >
-                        Send
+                        <MdSend size={20} color="#000000" />
                     </Button>
-                </Flex>
+                </Box>
             </Box>
         </Flex>
     );
