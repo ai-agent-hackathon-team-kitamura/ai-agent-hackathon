@@ -12,13 +12,13 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ sender, children }) => {
     return (
-        <Flex justify={sender === 'user' ? 'flex-end' : 'flex-start'}>
+        <Flex justify={sender === 'user' ? 'flex-end' : 'flex-start'} mb={4}>
             <Box
-                p={3}
-                bg={sender === 'user' ? 'blue.500' : 'transparent'}
-                color={sender === 'user' ? 'white' : 'black'}
-                maxWidth={sender === 'user' ? "50%" : "90%"}
-                borderRadius={sender === 'user' ? "xl" : undefined}
+                p={4}
+                bg={sender === 'user' ? '#FFFAF1' : '#F4F4F4'}
+                color="black"
+                maxWidth="90%"
+                borderRadius="lg"
             >
                 <Text>{children}</Text>
             </Box>
