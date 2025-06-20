@@ -84,6 +84,8 @@ async def evaluate_conversations(request: EvaluateRequest):
         # サービスはHealthドメインオブジェクトを返す
         health_result = await survey_service.evaluate_conversations(request.messages)
         
+        # TODO:UserEngagementSurveyテーブルに結果保存
+
         # ドメインオブジェクトをレスポンスモデルが要求する辞書形式に変換する
         return EvaluateResponse(
             uid=request.uid,
