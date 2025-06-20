@@ -1,10 +1,11 @@
 """全てのルーティングを管理"""
 
 from fastapi import APIRouter
+from datetime import datetime
 from app.services.llm_chat_service import LLMChatService
 from app.services.survey_service import SurveyService
 from app.infrastructure.vertex_chat_llm_client import VertexChatLLMClient
-from app.spec import ChatRequest, ChatResponse, HealthResponse, StartSurveyRequest, StartSurveyResponse, ChatMessageDto
+from app.spec import ChatRequest, ChatResponse, HealthResponse, StartSurveyRequest, StartSurveyResponse, EvaluateResponse,EvaluateRequest
 
 
 router = APIRouter()
@@ -47,10 +48,10 @@ async def start_survey(request: StartSurveyRequest):
     try:
         # 依存関係をセットアップし、適切なサービスを呼び出す
         llm_client = VertexChatLLMClient()
-        interview_service = SurveyService(llm_client)
+        survey_service = SurveyService(llm_client)
 
         # サービスを呼び出してビジネスロジックを実行
-        result = await interview_service.create_opening_message(request.health)
+        result = await survey_service.create_opening_message(request.health)
 
         # サービスからの結果をHTTPレスポンスに変換する
         if result.get("success"):
@@ -66,3 +67,33 @@ async def start_survey(request: StartSurveyRequest):
     except Exception as e:
         # 予期せぬエラーが発生した場合のフォールバック
         return StartSurveyResponse(success=False, error=f"サーバー内部でエラーが発生しました: {str(e)}")
+
+
+@router.post("/evaluate", response_model=EvaluateResponse)
+async def evaluate_conversations(request: EvaluateRequest):
+    """
+    会話履歴をLLMが分析し、エンゲージメントスコア算出
+    """
+    created_at = datetime.today().strftime("%Y%m%d")
+
+    try:
+        # 依存関係をセットアップし、適切なサービスを呼び出す
+        llm_client = VertexChatLLMClient()
+        survey_service = SurveyService(llm_client)
+
+        # サービスはHealthドメインオブジェクトを返す
+        health_result = await survey_service.evaluate_conversations(request.messages)
+        
+        # TODO:UserEngagementSurveyテーブルに結果保存
+
+        # ドメインオブジェクトをレスポンスモデルが要求する辞書形式に変換する
+        return EvaluateResponse(
+            uid=request.uid,
+            success=True,
+            health=health_result.to_dict(),
+            created_at=created_at
+        )
+
+    except Exception as e:
+        return EvaluateResponse(uid=request.uid,success=False, created_at=created_at,error=f"サーバー内部でエラーが発生しました: {str(e)}")
+
