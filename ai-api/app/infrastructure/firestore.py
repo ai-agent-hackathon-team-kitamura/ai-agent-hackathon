@@ -21,14 +21,14 @@ def upsert_user_engagement_survey(uid: str, engagement_map: dict):
     doc_ref = db.collection("UserEngagementSurvey").document(uid)
 
     # ドキュメントの存在確認
-    if doc_ref.get().exists:        
+    if doc_ref.get().exists:    
         doc_ref.update({
-            "engagementMap": firestore.ArrayUnion(engagement_map)
+            "engagementMap": firestore.ArrayUnion([engagement_map])
         })
     else:
         # 新規作成
         doc_ref.set({
             "uid": uid,
-            "engagementMap": engagement_map
+            "engagementMap": [engagement_map]
         })
 
