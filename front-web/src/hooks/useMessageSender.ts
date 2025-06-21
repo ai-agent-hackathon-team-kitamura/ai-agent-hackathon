@@ -4,10 +4,9 @@ import type { Message } from '@/types/chat';
 
 export const useMessageSender = (
     messages: Message[],
-    addMessages: (messages: Message[]) => void,
-    reset: () => void
+    addMessages: (messages: Message[]) => void
 ) => {
-    const [sendMessage, { isLoading, error, isError }] = useSendMessageMutation();
+    const [sendMessage, { isLoading, error, isError, reset }] = useSendMessageMutation();
 
     const handleSendMessage = useCallback(async (inputValue: string) => {
         const trimmedInput = inputValue.trim();

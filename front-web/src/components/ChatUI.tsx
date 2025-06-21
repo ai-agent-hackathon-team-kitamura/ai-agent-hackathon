@@ -17,8 +17,7 @@ const ChatUI: React.FC = () => {
     
     const { handleSendMessage: sendMessage, isLoading, error, isError } = useMessageSender(
         messages,
-        addMessages,
-        () => {}
+        addMessages
     );
     const { handleTextareaChange } = useAutoResizeTextarea();
 
