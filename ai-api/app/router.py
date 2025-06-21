@@ -1,12 +1,15 @@
 """全てのルーティングを管理"""
 
+from http.client import HTTPException
+from requests import Request, Response
 from fastapi import APIRouter
 from datetime import datetime
 from app.services.llm_chat_service import LLMChatService
 from app.services.survey_service import SurveyService
 from app.infrastructure.vertex_chat_llm_client import VertexChatLLMClient
 from app.spec import ChatRequest, ChatResponse, HealthResponse, StartSurveyRequest, StartSurveyResponse, EvaluateResponse,EvaluateRequest
-
+from app.infrastructure.firestore import upsert_user_engagement_survey, get_health
+from datetime import datetime
 
 router = APIRouter()
 
@@ -50,19 +53,20 @@ async def start_survey(request: StartSurveyRequest):
         llm_client = VertexChatLLMClient()
         survey_service = SurveyService(llm_client)
 
-        # サービスを呼び出してビジネスロジックを実行
-        result = await survey_service.create_opening_message(request.health)
-
-        # サービスからの結果をHTTPレスポンスに変換する
-        if result.get("success"):
+        # 前回のhealth情報を取得
+        uid = request.uid
+        health = get_health(uid)
+        if health is None:
             return StartSurveyResponse(
-                success=True,
-                opening_message=result.get("opening_message")
-            )
+            success=True,
+            opening_message="こんにちは"
+            ) 
         else:
+            # サービスを呼び出してビジネスロジックを実行
+            result = await survey_service.create_opening_message(health)
             return StartSurveyResponse(
-                success=False,
-                error=result.get("error")
+            success=True,
+            opening_message=result.get("opening_message")
             )
     except Exception as e:
         # 予期せぬエラーが発生した場合のフォールバック
@@ -83,8 +87,14 @@ async def evaluate_conversations(request: EvaluateRequest):
 
         # サービスはHealthドメインオブジェクトを返す
         health_result = await survey_service.evaluate_conversations(request.messages)
-        
-        # TODO:UserEngagementSurveyテーブルに結果保存
+        chat_history = [msg.dict() for msg in request.messages]
+        now = datetime.now()
+        engagement_map = {
+            "createdAt": now,
+            "chatHistory": chat_history,
+            "health": health_result.__dict__
+        }
+        upsert_user_engagement_survey(request.uid, engagement_map)
 
         # ドメインオブジェクトをレスポンスモデルが要求する辞書形式に変換する
         return EvaluateResponse(
@@ -96,4 +106,23 @@ async def evaluate_conversations(request: EvaluateRequest):
 
     except Exception as e:
         return EvaluateResponse(uid=request.uid,success=False, created_at=created_at,error=f"サーバー内部でエラーが発生しました: {str(e)}")
+
+# @router.post("/userinfo")
+# async def create_user_info(request: Request):
+#     """UserInfoコレクションにデータを保存する"""
+#     data = await request.json()
+
+#     if "uid" not in data or "department" not in data:
+#         raise HTTPException(status_code=400, detail="uid and department are required.")
+
+#     uid = data["uid"]
+#     department = data["department"]
+
+#     doc_ref = db.collection("UserInfo").document(uid)
+#     doc_ref.set({
+#         "uid": uid,
+#         "department": department
+#     })
+
+#     return Response(status_code=201)
 
