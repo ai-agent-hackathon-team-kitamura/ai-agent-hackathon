@@ -8,10 +8,12 @@ import {
     Alert,
     Text,
     Textarea,
+    Spinner,
 } from '@chakra-ui/react';
 import { MdSend } from 'react-icons/md';
 import ChatMessage from './ChatMessage';
 import { useSendMessageMutation } from '@/store/api';
+import { useChatMessages } from '@/hooks/useChatMessages';
 
 interface Message {
     id: string;
@@ -20,9 +22,9 @@ interface Message {
 }
 
 const ChatUI: React.FC = () => {
-    const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [sendMessage, { isLoading, error, isError, reset }] = useSendMessageMutation();
+    const { messages, addMessages, isInitialLoading } = useChatMessages();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -45,20 +47,20 @@ const ChatUI: React.FC = () => {
 
     const handleSendMessage = async () => {
         const trimmedInput = inputValue.trim();
-        if (!trimmedInput || isLoading) return;
+        if (!trimmedInput || isLoading || isInitialLoading) return;
 
         const userMessage: Message = {
             id: crypto.randomUUID(),
             content: trimmedInput,
             role: 'user'
         };
-        const newMessages = [...messages, userMessage];
-        setMessages(newMessages);
+        addMessages([userMessage]);
         setInputValue('');
         reset();
 
+        const currentMessages = [...messages, userMessage];
         const result = await sendMessage({
-            messages: newMessages.map(msg => ({ role: msg.role, content: msg.content }))
+            messages: currentMessages.map(msg => ({ role: msg.role, content: msg.content }))
         });
 
         if ('data' in result && result.data?.success && result.data.generated_text) {
@@ -67,7 +69,7 @@ const ChatUI: React.FC = () => {
                 content: result.data.generated_text,
                 role: 'assistant'
             };
-            setMessages([...newMessages, assistantMessage]);
+            addMessages([assistantMessage]);
         }
     };
 
@@ -100,26 +102,34 @@ const ChatUI: React.FC = () => {
                     flexDirection="column"
                     justifyContent="flex-end"
                 >
-                    {messages.length > 0 && (
-                        <Flex alignItems="center" mb={8} width="100%">
-                            <Box flex="1" height="2px" bg="#662B1C"></Box>
-                            <Text
-                                fontSize="2xl"
-                                fontWeight="bold"
-                                color="#662B1C"
-                                px={6}
-                                whiteSpace="nowrap"
-                            >
-                                2025年6月エンゲージメントサーベイ
-                            </Text>
-                            <Box flex="1" height="2px" bg="#662B1C"></Box>
+                    {isInitialLoading ? (
+                        <Flex justifyContent="center" alignItems="center" height="200px">
+                            <Spinner size="lg" color="blue.500" />
                         </Flex>
+                    ) : (
+                        <>
+                            {messages.length > 0 && (
+                                <Flex alignItems="center" mb={8} width="100%">
+                                    <Box flex="1" height="2px" bg="#662B1C"></Box>
+                                    <Text
+                                        fontSize="2xl"
+                                        fontWeight="bold"
+                                        color="#662B1C"
+                                        px={6}
+                                        whiteSpace="nowrap"
+                                    >
+                                        2025年6月エンゲージメントサーベイ
+                                    </Text>
+                                    <Box flex="1" height="2px" bg="#662B1C"></Box>
+                                </Flex>
+                            )}
+                            {messages.map((message) => (
+                                <ChatMessage key={message.id} sender={message.role === 'user' ? 'user' : 'bot'}>
+                                    {message.content}
+                                </ChatMessage>
+                            ))}
+                        </>
                     )}
-                    {messages.map((message) => (
-                        <ChatMessage key={message.id} sender={message.role === 'user' ? 'user' : 'bot'}>
-                            {message.content}
-                        </ChatMessage>
-                    ))}
                     <div ref={messagesEndRef} />
                 </Box>
             </Box>
@@ -151,7 +161,7 @@ const ChatUI: React.FC = () => {
                                 handleSendMessage();
                             }
                         }}
-                        disabled={isLoading}
+                        disabled={isLoading || isInitialLoading}
                         bg="white"
                         border="1px solid"
                         borderColor="gray.300"
@@ -175,7 +185,7 @@ const ChatUI: React.FC = () => {
                         _hover={{ bg: "gray.100" }}
                         p={2}
                         onClick={handleSendMessage}
-                        disabled={isLoading}
+                        disabled={isLoading || isInitialLoading}
                         borderRadius="lg"
                         minW="auto"
                         h="auto"
