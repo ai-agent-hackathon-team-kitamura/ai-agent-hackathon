@@ -30,6 +30,24 @@ export interface StartSurveyResponse {
   error?: string;
 }
 
+export interface EvaluateRequest {
+  uid: string;
+  messages: ChatMessage[];
+}
+
+export interface HealthEvaluation {
+  note: string;
+  score: number;
+}
+
+export interface EvaluateResponse {
+  uid: string;
+  success: boolean;
+  health: HealthEvaluation;
+  created_at: string;
+  error?: string;
+}
+
 export const chatApi = createApi({
   reducerPath: "chatApi",
   baseQuery: fetchBaseQuery({
@@ -50,7 +68,14 @@ export const chatApi = createApi({
         body,
       }),
     }),
+    evaluate: builder.query<EvaluateResponse, EvaluateRequest>({
+      query: (body) => ({
+        url: "/evaluate",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useSendMessageMutation, useStartSurveyQuery } = chatApi;
+export const { useSendMessageMutation, useStartSurveyQuery, useEvaluateQuery } = chatApi;

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useStartSurveyQuery } from "@/store/api";
+import { useEvaluate } from "./useEvaluate";
 
 interface Message {
   id: string;
@@ -31,9 +32,12 @@ export const useChatMessages = () => {
     setUserMessages((prev) => [...prev, ...messages]);
   }, []);
 
+  const { isEvaluating } = useEvaluate(uid, allMessages);
+
   return {
     messages: allMessages,
     addMessages,
     isInitialLoading,
+    isEvaluating,
   };
 };
