@@ -10,9 +10,17 @@ def get_health(uid: str):
 
     if doc.exists:
         data = doc.to_dict()
-        engagement_map = data.get("engagementMap", {})
-        health = engagement_map.get("health")
-        return health
+        engagement_map_list = data.get("engagementMap", [])
+        if isinstance(engagement_map_list, list) and len(engagement_map_list) > 0:
+            # createdAt（日付型）で最新を探す
+            latest_map = max(
+                engagement_map_list, 
+                key=lambda x: x.get("createdAt")  # FirestoreのTimestamp型（datetime型）
+            )
+            health = latest_map.get("health")
+            return health
+        else:
+            return None  # 配列が空
     else:
         return None  # 該当uidなし
 
