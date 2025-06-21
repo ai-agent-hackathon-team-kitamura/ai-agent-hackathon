@@ -6,6 +6,14 @@ interface ErrorDisplayProps {
     error: unknown;
 }
 
+const getErrorMessage = (error: unknown): string => {
+    if (typeof error === 'object' && error && 'data' in error) {
+        const data = (error as { data?: unknown }).data;
+        if (typeof data === 'string') return data;
+    }
+    return 'メッセージの送信に失敗しました。もう一度お試しください。';
+};
+
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ isError, error }) => {
     if (!isError || !error) return null;
 
@@ -15,10 +23,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ isError, error }) => {
                 <Alert.Indicator />
                 <Alert.Content>
                     <Alert.Description>
-                        {typeof error === 'object' && error !== null && 'data' in error && (error as {data?: unknown}).data
-                            ? (typeof (error as {data: unknown}).data === 'string' ? (error as {data: string}).data : 'メッセージの送信に失敗しました')
-                            : 'メッセージの送信に失敗しました。もう一度お試しください。'
-                        }
+                        {getErrorMessage(error)}
                     </Alert.Description>
                 </Alert.Content>
             </Alert.Root>
