@@ -60,8 +60,7 @@ class HealthData(BaseModel):
 
 class StartSurveyRequest(BaseModel):
     """面談開始リクエスト"""
-    health: HealthData = Field(..., description="最新の健康状態データ")
-    createdAt: str = Field(..., description="作成日", example="20250615")
+    uid: str = Field(...,description="ユーザID",example="xxx")
 
 class StartSurveyResponse(BaseModel):
     """面談開始レスポンス"""

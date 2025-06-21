@@ -46,8 +46,8 @@ class SurveyService:
         """
 
         prompt = prompt_template.format(
-            score=health_data.score,
-            note=health_data.note
+            score=health_data["score"],
+            note=health_data["note"]
         )
 
         # ドメインオブジェクトに変換してLLMに渡す
