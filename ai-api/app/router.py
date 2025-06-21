@@ -59,7 +59,9 @@ async def start_survey(request: StartSurveyRequest):
         if health is None:
             return StartSurveyResponse(
             success=True,
-            opening_message="こんにちは"
+            opening_message="""はじめまして！
+日々のちょっとした不安やモヤモヤ、仕事のことでもプライベートのことでも、気軽に話してみてくださいね。
+最近「困っていること」や「気になっていること」などありませんか？"""
             ) 
         else:
             # サービスを呼び出してビジネスロジックを実行
