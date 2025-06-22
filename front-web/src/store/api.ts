@@ -1,7 +1,7 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
@@ -21,8 +21,7 @@ export interface HealthData {
 }
 
 export interface StartSurveyRequest {
-  health: HealthData;
-  createdAt: string;
+  uid: string;
 }
 
 export interface StartSurveyResponse {
@@ -31,27 +30,52 @@ export interface StartSurveyResponse {
   error?: string;
 }
 
+export interface EvaluateRequest {
+  uid: string;
+  messages: ChatMessage[];
+}
+
+export interface HealthEvaluation {
+  note: string;
+  score: number;
+}
+
+export interface EvaluateResponse {
+  uid: string;
+  success: boolean;
+  health: HealthEvaluation;
+  created_at: string;
+  error?: string;
+}
+
 export const chatApi = createApi({
-  reducerPath: 'chatApi',
+  reducerPath: "chatApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api',
+    baseUrl: "/api",
   }),
   endpoints: (builder) => ({
     sendMessage: builder.mutation<ChatResponse, ChatRequest>({
       query: (body) => ({
-        url: '/chat',
-        method: 'POST',
+        url: "/chat",
+        method: "POST",
         body,
       }),
     }),
     startSurvey: builder.query<StartSurveyResponse, StartSurveyRequest>({
       query: (body) => ({
-        url: '/start-survey',
-        method: 'POST',
+        url: "/start-survey",
+        method: "POST",
+        body,
+      }),
+    }),
+    evaluate: builder.query<EvaluateResponse, EvaluateRequest>({
+      query: (body) => ({
+        url: "/evaluate",
+        method: "POST",
         body,
       }),
     }),
   }),
 });
 
-export const { useSendMessageMutation, useStartSurveyQuery } = chatApi;
+export const { useSendMessageMutation, useStartSurveyQuery, useEvaluateQuery } = chatApi;
