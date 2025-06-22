@@ -123,3 +123,5 @@ class SurveyService:
             speaker = "ユーザー" if msg.role == "user" else "アシスタント"
             text_parts.append(f"{speaker}: {msg.content}")
         return "\n".join(text_parts)
+    
+    

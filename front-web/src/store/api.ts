@@ -47,6 +47,13 @@ export interface EvaluateResponse {
   created_at: string;
   error?: string;
 }
+export interface SummeryResponse {
+  average_score: number;
+  success: boolean;
+  good_point: string;
+  bad_point: string;
+  error?: string;
+}
 
 export const chatApi = createApi({
   reducerPath: "chatApi",
@@ -75,7 +82,13 @@ export const chatApi = createApi({
         body,
       }),
     }),
+    summery: builder.query<SummeryResponse, void>({
+      query: () => ({
+        url: "/summery",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useSendMessageMutation, useStartSurveyQuery, useEvaluateQuery } = chatApi;
+export const { useSendMessageMutation, useStartSurveyQuery, useEvaluateQuery, useSummeryQuery } = chatApi;

@@ -95,3 +95,12 @@ class EvaluateResponse(BaseModel):
     )
     created_at:str= Field(...,description="作成日(YYYYMMDD")
     error: Optional[str] = Field(None, description="エラーメッセージ（失敗時のみ）")
+
+
+class SummeryResponse(BaseModel):
+    """最新要約レスポンス"""
+    average_score: int = Field(...,description="今月の平均点")
+    success: bool = Field(..., description="処理の成功/失敗")
+    good_point: str = Field(...,description="今月のgood point")
+    bad_point: str = Field(...,description="今月のbad point")
+    error: Optional[str] = Field(None, description="エラーメッセージ（失敗時のみ）")
