@@ -13,10 +13,12 @@ import {
 } from '@chakra-ui/react';
 import { BiHappyBeaming } from 'react-icons/bi';
 import { FiFrown } from 'react-icons/fi';
+import { useSummeryQuery } from '@/store/api';
 
 const Dashboard = () => {
     const textColor = 'gray.800';
     const mutedColor = 'gray.600';
+    const { data, error, isLoading } = useSummeryQuery();
 
     return (
         <Container maxW="container.xl" p={8} m={8} backgroundColor="white" borderRadius="xl">
@@ -28,7 +30,7 @@ const Dashboard = () => {
             <Heading size="xl" color={textColor}>健康</Heading>
             <Text color={mutedColor}>従業員のみなさまの身体・ココロの健康についてのデータです。</Text>
 
-            <Progress.Root value={94} size="lg" colorPalette="blue" mb={6}>
+            <Progress.Root value={data?.average_score ?? 0} size="lg" colorPalette="blue" mb={6}>
                 <Progress.Track height="42px">
                     <Progress.Range bg="rgb(49, 130, 206)" />
                 </Progress.Track>
@@ -55,10 +57,8 @@ const Dashboard = () => {
                     </Icon>
                     良い点
                 </Heading>
-                <Text lineHeight="tall">
-                    比較年月当時のスコアと比較すると、健康・やる気・人間関係についてのスコアが上昇しています。
-                    特に「中期経営計画」というワードが頻繁に見られることから、経営層のみなさまの想いが従業員のみなさまに届いたのではないかと考えられます。
-                    その中でも特に「〇〇」という施策に対するポジティブな意見が多く見られたことあり、この施策を強く推進していくことで、エンゲージメントの向上に繋がることが考えられます。
+                <Text color={mutedColor} lineHeight="tall">
+                    {data?.good_point || "良い点のデータがありません。"}
                 </Text>
             </GridItem>
 
@@ -67,11 +67,10 @@ const Dashboard = () => {
                     <Icon color="rgb(229, 62, 62)" mr={2} mb={1}>
                         <FiFrown size={20} />
                     </Icon>
-                    改善点
+                    悪い点
                 </Heading>
-                <Text lineHeight="tall">
-                    比較年月当時のスコアと比較すると、モチベーションについてのスコアが下降しています。
-                    xxxx.....
+                <Text color={mutedColor} lineHeight="tall">
+                    {data?.bad_point || "悪い点のデータがありません。"}
                 </Text>
             </GridItem>
         </Container>

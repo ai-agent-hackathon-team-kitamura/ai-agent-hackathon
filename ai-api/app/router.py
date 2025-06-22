@@ -1,15 +1,12 @@
 """全てのルーティングを管理"""
-
-from http.client import HTTPException
-from requests import Request, Response
 from fastapi import APIRouter
-from datetime import datetime
+from datetime import datetime, timezone
 from app.services.llm_chat_service import LLMChatService
 from app.services.survey_service import SurveyService
+from app.services.summery_service import SummeryService
 from app.infrastructure.vertex_chat_llm_client import VertexChatLLMClient
-from app.spec import ChatRequest, ChatResponse, HealthResponse, StartSurveyRequest, StartSurveyResponse, EvaluateResponse,EvaluateRequest
-from app.infrastructure.firestore import upsert_user_engagement_survey, get_health
-from datetime import datetime
+from app.spec import ChatRequest, ChatResponse, HealthResponse, StartSurveyRequest, StartSurveyResponse, EvaluateResponse,EvaluateRequest, SummeryResponse
+from app.infrastructure.firestore import upsert_user_engagement_survey, get_health, get_all_latest_health
 
 router = APIRouter()
 
@@ -90,7 +87,7 @@ async def evaluate_conversations(request: EvaluateRequest):
         # サービスはHealthドメインオブジェクトを返す
         health_result = await survey_service.evaluate_conversations(request.messages)
         chat_history = [msg.dict() for msg in request.messages]
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         engagement_map = {
             "createdAt": now,
             "chatHistory": chat_history,
@@ -109,22 +106,39 @@ async def evaluate_conversations(request: EvaluateRequest):
     except Exception as e:
         return EvaluateResponse(uid=request.uid,success=False, created_at=created_at,error=f"サーバー内部でエラーが発生しました: {str(e)}")
 
-# @router.post("/userinfo")
-# async def create_user_info(request: Request):
-#     """UserInfoコレクションにデータを保存する"""
-#     data = await request.json()
+@router.get("/summery", response_model=SummeryResponse)
+async def summery():
+    """
+    LLMで分析し最新レポートに表示するデータを返す
+    """
+    healthList = get_all_latest_health()
+    score_sum = 0
+    note_list = []
+    try:
+        for i in healthList:
+            score_sum += i["score"]
+            note_list.append(i["note"])
+        average_score = round(score_sum / len(healthList))
 
-#     if "uid" not in data or "department" not in data:
-#         raise HTTPException(status_code=400, detail="uid and department are required.")
+        llm_client = VertexChatLLMClient()
+        # 依存性注入：インフラ層をアプリケーションサービスに注入
+        summery_service = SummeryService(llm_client)
+        result = await summery_service.create_summery(note_list)
+        good_point = result["summery"]["goodPoint"]
+        bad_point = result["summery"]["badPoint"]
 
-#     uid = data["uid"]
-#     department = data["department"]
-
-#     doc_ref = db.collection("UserInfo").document(uid)
-#     doc_ref.set({
-#         "uid": uid,
-#         "department": department
-#     })
-
-#     return Response(status_code=201)
+        return SummeryResponse(
+            average_score = average_score,
+            success=True,
+            good_point = good_point,
+            bad_point = bad_point,
+        )
+    except Exception as e:
+        return SummeryResponse(
+            average_score=0,
+            success=False,
+            good_point="",
+            bad_point="",
+            error=f"サーバー内部でエラーが発生しました: {str(e)}",
+        )
 
