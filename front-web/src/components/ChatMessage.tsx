@@ -4,10 +4,12 @@ import {
     Text,
     Flex,
 } from '@chakra-ui/react';
+import ReactMarkdown from 'react-markdown';
+import { Prose } from '@/components/ui/prose';
 
 interface ChatMessageProps {
     sender: 'user' | 'bot';
-    children: React.ReactNode;
+    children: string;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ sender, children }) => {
@@ -20,7 +22,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ sender, children }) => {
                 maxWidth="90%"
                 borderRadius="lg"
             >
-                <Text>{children}</Text>
+                <Prose color="inherit" maxWidth="none">
+                    <ReactMarkdown>{children}</ReactMarkdown>
+                </Prose>
             </Box>
         </Flex>
     );
