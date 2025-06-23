@@ -33,9 +33,13 @@ async def chat_completion(request: ChatRequest):
     """
     llm_client = VertexChatLLMClient()
     # 依存性注入：インフラ層をアプリケーションサービスに注入
+    survey_service = SurveyService(llm_client)
     chat_service = LLMChatService(llm_client)
-    result = await chat_service.invoke(request.messages, request.schema)
-    return result
+    is_completed=await survey_service.is_conversation_completed(request.messages)
+    chat_result = await chat_service.invoke(request.messages, request.schema)
+
+    response_payload = {**chat_result, "is_completed": is_completed}
+    return ChatResponse(**response_payload)
 
 
 @router.post("/start-survey", response_model=StartSurveyResponse)
