@@ -13,6 +13,7 @@ export interface ChatResponse {
   success: boolean;
   generated_text?: string;
   error?: string;
+  is_completed: boolean;
 }
 
 export interface HealthData {
