@@ -115,6 +115,83 @@ class SurveyService:
 
         # 辞書からドメインオブジェクトを生成して返す
         return Health.from_dict(health_dict)
+    async def is_conversation_completed(
+        self,
+        message_history: List[ChatMessageDto],
+    ) -> bool:
+        """会話が完結しているかを bool で返す"""
+        prompt_template = """
+        以下の1on1面談の会話履歴を読み、会話がすでに自然に終了しているか判定してください。
+        会話の内容を詳細に分析して、従業員が持っている健康に関する課題が解決し、明日から健康に過ごせそうか？を基準に判断してください。
+        また、ユーザーとアシスタントの双方が「ありがとうございました」「来月もよろしくお願いします」と言ってる場合など、明示的に会話が終了してる合図があった場合でも完了判定してください。
+        会話が一区切りしてるとしても、ありがとうございましたのような明示的な終了の挨拶がない限りはFalseとしてください。
+        具体的には下記に示す入出力例を参考にしてください。
+
+        出力は JSON 形式で、次のスキーマを厳守してください：
+        {{
+        "completed": boolean,   // true なら会話は終了済み
+        "note": string          // 判定理由を 50 文字以内で
+        }}
+
+        --- 会話履歴 ---
+        {message_history}
+        ---------------------
+
+        ## 入出力例
+        ## 入力例1
+        ユーザー:「最近寝れてないですよね」
+        アシスタント:「早めに退勤して寝てくださいね。」
+
+        ## 出力例1
+        False(会話は一区切りしてるが、従業員の問題は解決していない)
+
+        ## 入力例2
+        ユーザー:「最近寝れてないですよね」
+        アシスタント:「早めに退勤して寝てくださいね。」
+        ユーザー:「ありがとう、上司に相談してみるよ。」
+
+        ## 出力例2
+        False(会話は一区切りしてるが、アシスタント:側の挨拶は完了していない。もしかしたら会話が続くかもしれないのでFalse)
+
+        ## 入力例3
+        ユーザー:「最近寝れてないですよね」
+        アシスタント:「早めに退勤して寝てくださいね。」
+        ユーザー:「ありがとう、上司に相談してみるよ。」
+        アシスタント:「そうですね、早速相談してみてください。今日はありがとうございました。」
+
+        ## 出力例3
+        True(双方の会話が一区切りしており、ネクストアクションも決まっている)
+
+        ## 入力例4
+        ユーザー: こんにちは
+        アシスタント: こんにちは！何かお手伝いできることはありますか？
+        ユーザー: 日本の首都はどこですか？
+        アシスタント: 東京です
+
+        ## 出力例4
+        False(双方の会話が一区切りしているが、ネクストアクションは決まっていないし、明示的な完了の挨拶もないため、もしかしたら会話はまだ続くかもしれない。)
+        """
+
+        schema = {
+            "type": "object",
+            "properties": {
+                "completed": {"type": "boolean"},
+                "note": {"type": "string"},
+            },
+            "required": ["completed", "note"],
+        }
+
+        history_text = self._format_history_as_text(message_history)
+        prompt = prompt_template.format(message_history=history_text)
+        messages = [Message(role="user", content=prompt)]
+
+        res = await self._llm_client.chat(messages, schema=schema)
+
+        if "completed" not in res:
+            raise ValueError("LLM から 'completed' キーが返却されませんでした。")
+        print(res["note"])
+        return bool(res["completed"])
+
 
     def _format_history_as_text(self, messages: List[ChatMessageDto]) -> str:
         """会話履歴を文字列に変換"""
