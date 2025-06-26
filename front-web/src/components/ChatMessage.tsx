@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     Box,
-    Text,
     Flex,
 } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';

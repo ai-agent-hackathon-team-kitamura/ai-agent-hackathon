@@ -18,7 +18,7 @@ import { useSummeryQuery } from '@/store/api';
 const Dashboard = () => {
     const textColor = 'gray.800';
     const mutedColor = 'gray.600';
-    const { data, error, isLoading } = useSummeryQuery();
+    const { data } = useSummeryQuery();
 
     return (
         <Container maxW="container.xl" p={8} m={8} backgroundColor="white" borderRadius="xl">
