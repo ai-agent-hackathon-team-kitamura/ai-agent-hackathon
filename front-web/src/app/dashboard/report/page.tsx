@@ -18,7 +18,7 @@ import { useSummeryQuery } from '@/store/api';
 const Dashboard = () => {
     const textColor = 'gray.800';
     const mutedColor = 'gray.600';
-    const { data, error, isLoading } = useSummeryQuery();
+    const { data } = useSummeryQuery();
 
     return (
         <Container maxW="container.xl" p={8} m={8} backgroundColor="white" borderRadius="xl">
@@ -30,10 +30,10 @@ const Dashboard = () => {
             <Heading size="xl" color={textColor}>健康</Heading>
             <Text color={mutedColor}>従業員のみなさまの身体・ココロの健康についてのデータです。</Text>
 
-            <Progress.Root value={94} size="lg" colorPalette="blue" mb={6}>
-                {/* <Progress.Track height="42px"> */}
-                {/* <Progress.Range bg="rgb(49, 130, 206)" /> */}
-                {/* </Progress.Track> */}
+            <Progress.Root value={data?.average_score ?? 0} size="lg" colorPalette="blue" mb={6}>
+                <Progress.Track height="42px">
+                    <Progress.Range bg="rgb(49, 130, 206)" />
+                </Progress.Track>
                 <Progress.Label />
             </Progress.Root>
 
