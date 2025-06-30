@@ -1,0 +1,5 @@
+{
+    "flavor": "dev",
+    "bffUrl": "http://127.0.0.1:5001/team-kitamura-dev/us-central1",
+    "bffUrl_仮置": "https://us-central1-team-kitamura-dev.cloudfunctions.net/"
+}
